@@ -1,0 +1,12 @@
+KittenFactory/Shared/obj/
+KittenFactory/Shared/bin/
+KittenFactory/Server/obj/
+KittenFactory/Server/bin/
+KittenFactory/Client/obj/
+KittenFactory/Client/bin/
+KittenFactory.Infrastructure/obj/
+KittenFactory.Infrastructure/bin/
+KittenFactory.Core/obj/
+KittenFactory.Core/bin/
+KittenFactory.Application/obj/
+KittenFactory.Application/bin/

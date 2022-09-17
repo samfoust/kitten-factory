@@ -1,0 +1,70 @@
+﻿@page "/cats/{Id:int}"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+
+@if (cat != null)
+{
+    var editUrl = $"cats/{cat.Id}/edit";
+    <div class="flex font-sans">
+        <div class="flex-none w-48 h-48 relative ">
+            <img src="@cat.ImageUrl" alt="" class="absolute inset-0 w-full h-full object-cover rounded-circle shadow-lg  " loading="lazy" />
+        </div>
+        <form class="flex-auto p-6">
+            <div class="flex-row">
+                <h1 class="flex-auto text-lg font-semibold text-slate-900">
+                    @cat.Name
+                </h1>
+                <div class="flex flex-row">
+                    <div class="w-24 flex-none text-sm font-medium text-slate-700 mt-2">
+                        Phone:
+                    </div>
+                    <div class="w-48 flex-none text-sm font-medium text-slate-700 mt-2">
+                        @cat.PhoneNumber
+                    </div>
+                </div>
+                 <div class="flex flex-row">
+                    <div class="w-24 flex-none text-sm font-medium text-slate-700 mt-2">
+                        Address:
+                    </div>
+                    <div class="w-48 flex-none text-sm font-medium text-slate-700 mt-2">
+                        @cat.Address
+                    </div>
+                </div>
+                <div class="flex flex-row">
+                    <div class="w-24 flex-none text-sm font-medium text-slate-700 mt-2">
+                        Date of Birth:
+                    </div>
+                    <div class="w-48 flex-none text-sm font-medium text-slate-700 mt-2">
+                        @cat.DateOfBirth.ToShortDateString()
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="flex space-x-4 pt-lg-4 mb-6 text-sm font-medium">
+                <div class="flex-auto flex space-x-4">
+                    <button @onclick="EditAsync" class="px-6 h-12 uppercase font-semibold tracking-wider border-2 border-black bg-teal-400 text-black" type="submit">
+                        Edit 
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public CatViewModel cat { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        cat = await Http.GetFromJsonAsync<CatViewModel>($"api/cats/{Id}");
+    }
+    private async Task EditAsync()
+    {
+        NavigationManager.NavigateTo($"cats/{cat.Id}/edit");
+    }
+}

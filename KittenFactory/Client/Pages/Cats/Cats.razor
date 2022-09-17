@@ -1,0 +1,43 @@
+﻿@page "/cats"
+@using KittenFactory.Shared
+@using KittenFactory.Shared.ViewModels;
+
+@inject HttpClient Http
+
+<PageTitle>Cats</PageTitle>
+
+@if (cats == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{   <a class="h-10 m-t-8 p-2 px-2 font-semibold rounded-md bg-black text-white" href="cats/create" >Create A Cat!! ⚡</a>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Name</th>
+
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cat in cats)
+            {
+                var viewUrl = $"cats/{cat.Id}";
+                <tr class="shadow-lg">
+                    <td class="w-36" ><img class="inset-0 w-36 h-36 object-cover rounded-1 shadow-lg  " src="@cat.ImageUrl" /></td>
+                    <td class="w-auto" ><a class="h-10 p-2 px-6 font-semibold rounded-md text-sky-500" href=@viewUrl >@cat.Name</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private CatViewModel[]? cats;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cats = await Http.GetFromJsonAsync<CatViewModel[]>("api/cats");
+    }
+}

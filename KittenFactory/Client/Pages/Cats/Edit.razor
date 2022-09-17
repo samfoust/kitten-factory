@@ -1,0 +1,77 @@
+﻿@page "/cats/{Id:int}/edit"
+@page "/cats/create"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+@if (cat != null)
+{
+    <button class="px-2 h-8 uppercase font-semibold tracking-wider border-2 border-black bg-gray-200 text-black" @onclick="Cancel">cancel</button>
+    if (cat.Id > 0)
+    {
+        <button class="px-2 h-8 uppercase font-semibold tracking-wider border-2 border-black bg-red-400 text-black" type="button" @onclick="DeleteAsync">
+            delete
+        </button>
+    }
+    <button class="px-2 h-8 uppercase font-semibold tracking-wider border-2 border-black bg-teal-200 text-black" type="button" @onclick="GetNewImageAsync">
+        new image
+    </button>
+    <div class="flex font-sans pt-4">
+        <div class="flex-none w-48 h-48 relative ">
+            <img src="@cat.ImageUrl" alt="" class="absolute inset-0 w-full h-full object-cover rounded-circle shadow-lg  " loading="lazy" />
+        </div>
+        <EditForm Model="@cat" class="flex-auto p-6" OnValidSubmit="@HandleValidSubmit">
+            <div class="flex-auto">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+            </div>
+            <div class="flex flex-row">
+                <label class="p-2 w-24 flex-none">Name</label>
+                <InputText class="border-2 w-64 border-secondary flex-none" id="name" @bind-Value="cat.Name" />
+            </div>
+            <div class="flex flex-row">
+                <label class="p-2 w-24 flex-none">Address</label>
+                <InputText ma class="border-2 w-64 border-secondary flex-none" id="address" @bind-Value="cat.Address" />
+            </div>
+            <div class="flex flex-row pb-4">
+                <label class="p-2 w-24 flex-none">Phone</label>
+                <InputText ma class="border-2 w-64 border-secondary flex-none" id="phonenumber" @bind-Value="cat.PhoneNumber" />
+            </div>
+            <button class="px-2  h-12 uppercase font-semibold tracking-wider border-2 border-black bg-green-200 text-black" type="submit">Submit</button>
+        </EditForm>
+    </div>
+
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    public CatViewModel cat { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        cat = await Http.GetFromJsonAsync<CatViewModel>($"api/cats/{Id}");
+        if (string.IsNullOrWhiteSpace(cat.ImageUrl))
+        {
+            await GetNewImageAsync();
+        }
+    }
+    private async void HandleValidSubmit()
+    {
+        var message = await Http.PostAsJsonAsync<CatViewModel>($"api/cats/{Id}", cat);
+        cat = await message.Content.ReadFromJsonAsync<CatViewModel>();
+        NavigationManager.NavigateTo($"cats/{cat.Id}");
+    }
+    private async Task GetNewImageAsync()
+    {
+        var images = await Http.GetFromJsonAsync<IEnumerable<CatImage>>($"https://api.thecatapi.com/v1/images/search");
+        cat.ImageUrl = images.ElementAt(0).Url;
+    }
+    private async Task DeleteAsync()
+    {
+        await Http.DeleteAsync($"api/cats/{Id}");
+        NavigationManager.NavigateTo($"cats");
+    }
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo($"cats/{Id}");
+    }
+}
